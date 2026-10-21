@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>机场套餐费用计算器｜现金支出与流量需求</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif; background: #f5f7fb; color: #17212e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.6; }
+    main { max-width: 880px; margin: 0 auto; padding: 32px 18px 64px; }
+    h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.25; }
+    h2 { margin: 0 0 18px; font-size: 1.2rem; }
+    p { margin: 8px 0 18px; }
+    .muted { color: #526173; }
+    .card { background: #fff; border: 1px solid #d9e2ec; border-radius: 16px; padding: 24px; margin: 22px 0; box-shadow: 0 8px 28px #1830470b; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    label { display: block; font-weight: 650; }
+    label span { display: block; font-weight: 400; font-size: .88rem; color: #526173; margin: 2px 0 6px; }
+    input, select { display: block; width: 100%; padding: 11px 12px; border: 1px solid #9aabba; border-radius: 9px; font: inherit; background: white; color: #17212e; }
+    input:focus, select:focus, button:focus { outline: 3px solid #95c9ff; outline-offset: 2px; }
+    button { margin-top: 22px; padding: 12px 22px; border: 0; border-radius: 9px; background: #0758a5; color: white; font: inherit; font-weight: 700; cursor: pointer; }
+    button:hover { background: #034884; }
+    .error { color: #a32020; font-weight: 650; min-height: 1.5em; }
+    .result-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .metric { padding: 14px; border-radius: 10px; background: #eef5fc; }
+    .metric strong { display: block; font-size: 1.25rem; }
+    .metric small { color: #526173; }
+    .notice { border-left: 4px solid #d68b16; padding: 8px 12px; background: #fff8e8; }
+    [hidden] { display: none !important; }
+    @media (max-width: 620px) { main { padding: 22px 14px 48px; } .card { padding: 18px; } .grid, .result-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>机场套餐费用计算器</h1>
+  <p class="muted">在本地浏览器计算实际付款、整期支出和流量是否够用。输入你在付款页核实的条件；本工具不联网，也不保存输入。</p>
+  <form id="calculator" class="card" novalidate>
+    <h2>输入套餐条件</h2>
+    <div class="grid">
+      <label>每次付款金额（元）<span>填结算页实际扣款，而非年付折合月价</span><input name="price" type="number" min="0" step="0.01" value="8" required inputmode="decimal"></label>
+      <label>付款周期<span>一次性流量选择“一次性购买”</span><select name="cycle"><option value="monthly">月付</option><option value="quarterly">季付</option><option value="semiannual">半年付</option><option value="annual">年付</option><option value="one_time">一次性购买</option></select></label>
+      <label>流量额度（GB）<span>月重置填每月额度；固定总量填全部额度</span><input name="traffic" type="number" min="0.01" step="any" value="80" required inputmode="decimal"></label>
+      <label>流量重置方式<span>不确定时选择“未知”，不会给出够用结论</span><select name="reset"><option value="monthly">每月重置</option><option value="fixed_total">固定总量</option><option value="unknown">未知</option></select></label>
+      <label>有效期（天，可留空）<span>固定总量若未知，长期费用只能给下界</span><input name="validity" type="number" min="1" step="1" inputmode="numeric" placeholder="例如 365"></label>
+      <label>预计使用月数<span>按整月、整期购买估算</span><input name="months" type="number" min="1" step="1" value="5" required inputmode="numeric"></label>
+      <label>预计每月流量需求（GB）<span>建议采用自己的高用量月份</span><input name="demand" type="number" min="0" step="any" value="50" required inputmode="decimal"></label>
+    </div>
+    <h2 style="margin-top:28px">可选：比较另一种付款方式</h2>
+    <p class="muted">只在两种价格对应同一服务、同一流量条件时使用；这里只比较现金支出。</p>
+    <div class="grid">
+      <label>另一方式每次付款（元）<span>留空则不比较</span><input name="otherPrice" type="number" min="0" step="0.01" inputmode="decimal" placeholder="例如 69.90"></label>
+      <label>另一付款周期<span>按整期购买计算</span><select name="otherCycle"><option value="monthly">月付</option><option value="quarterly">季付</option><option value="semiannual">半年付</option><option value="annual">年付</option></select></label>
+    </div>
+    <button type="submit">计算费用</button>
+    <p class="error" id="error" role="alert"></p>
+  </form>
+  <section class="card" id="results" aria-live="polite" hidden>
+    <h2>计算结果</h2>
+    <div id="metrics" class="result-grid"></div>
+    <p id="coverage" class="notice"></p>
+    <p id="comparison"></p>
+    <p class="muted">计算按每月 30 天估算有效期、按整期付款、价格不变、未用月份不退款。固定总量多份套餐的费用只是下界；商家的续购、叠加、到期及退款规则可能改变结果。名义每 GB 成本按购得额度计算，未用完时实际每已用 GB 成本更高。</p>
+  </section>
+</main>
+<script>
+"use strict";
+const cycleMonths = {monthly: 1, quarterly: 3, semiannual: 6, annual: 12};
+const money = n => `¥${n.toFixed(2)}`;
+const finite = (n, label, allowZero = false) => {
+  if (!Number.isFinite(n) || (allowZero ? n < 0 : n <= 0)) throw new Error(`${label}须为${allowZero ? "非负" : "大于零的"}数字。`);
+  return n;
+};
+function calculatePlan(input) {
+  for (const [field, label] of [["price", "付款金额"], ["traffic", "流量额度"], ["months", "使用月数"], ["demand", "每月流量需求"]]) {
+    if (input[field] === "" || input[field] === null || input[field] === undefined) throw new Error(`请填写${label}。`);
+  }
+  const price = finite(Number(input.price), "付款金额", true);
+  const traffic = finite(Number(input.traffic), "流量额度");
+  const months = finite(Number(input.months), "使用月数");
+  const demand = finite(Number(input.demand), "每月流量需求", true);
+  if (!Number.isInteger(months)) throw new Error("使用月数须为整数。");
+  const cycle = input.cycle, reset = input.reset;
+  if (!(cycle in cycleMonths) && cycle !== "one_time") throw new Error("请选择有效的付款周期。");
+  if (!["monthly", "fixed_total", "unknown"].includes(reset)) throw new Error("请选择有效的流量重置方式。");
+  if (cycle === "one_time" && reset !== "fixed_total") throw new Error("一次性购买应选择固定总流量；请核对套餐条件。");
+  let validity = null;
+  if (input.validity !== "" && input.validity !== null && input.validity !== undefined) {
+    validity = finite(Number(input.validity), "有效期");
+    if (!Number.isInteger(validity)) throw new Error("有效期须为整数天数。");
+  }
+  const totalNeed = months * demand;
+  let packages, total, unitCost = null, coverage, note = "";
+  if (cycle === "one_time") {
+    const byTraffic = Math.max(1, Math.ceil(totalNeed / traffic));
+    const byTime = validity ? Math.ceil(months * 30 / validity) : 1;
+    packages = Math.max(byTraffic, byTime);
+    total = packages * price;
+    unitCost = price / traffic;
+    coverage = totalNeed <= traffic && (!validity || months * 30 <= validity) ? "单份额度满足预计总流量；仍须核对有效期和使用规则。" : `单份不能覆盖全部计划；按总量/有效期至少需 ${packages} 份。`;
+    note = validity ? "多份购买及叠加规则未知，所示总费用为下界。" : "有效期未知，所示总费用仅是基于流量的下界。";
+  } else {
+    packages = Math.ceil(months / cycleMonths[cycle]);
+    total = packages * price;
+    if (reset === "monthly") {
+      coverage = demand <= traffic ? "每月预计需求不超过月度额度。" : "每月预计需求超过额度；费用未包含补流量或升级。";
+      unitCost = price / (cycleMonths[cycle] * traffic);
+    } else if (reset === "fixed_total") {
+      coverage = totalNeed <= packages * traffic ? "按总量估算额度足够；需核对各期何时发放和结转。" : "按总量估算额度不足；费用未包含补充购买。";
+      unitCost = price / traffic;
+    } else {
+      coverage = "流量重置方式未知，无法判断是否满足需求或计算可靠的每 GB 成本。";
+    }
+    note = `按整期购买 ${packages} 次；预付覆盖 ${packages * cycleMonths[cycle]} 个月。`;
+  }
+  let comparison = null;
+  if (input.otherPrice !== "" && input.otherPrice !== null && input.otherPrice !== undefined) {
+    const otherPrice = finite(Number(input.otherPrice), "另一方式付款金额", true);
+    const otherCycle = input.otherCycle;
+    if (!(otherCycle in cycleMonths)) throw new Error("请选择另一种有效付款周期。");
+    const otherPayments = Math.ceil(months / cycleMonths[otherCycle]);
+    const otherTotal = otherPayments * otherPrice;
+    comparison = {otherTotal, otherPayments, difference: otherTotal - total};
+  }
+  return {price, packages, total, unitCost, annualMonthly: cycle === "annual" ? price / 12 : null, totalNeed, coverage, note, comparison};
+}
+const form = document.getElementById("calculator");
+function metric(label, value, detail = "") {
+  const box = document.createElement("div"); box.className = "metric";
+  const name = document.createElement("small"); name.textContent = label;
+  const amount = document.createElement("strong"); amount.textContent = value;
+  box.append(name, amount);
+  if (detail) { const small = document.createElement("small"); small.textContent = detail; box.append(small); }
+  return box;
+}
+form.addEventListener("submit", event => {
+  event.preventDefault();
+  const values = Object.fromEntries(new FormData(form).entries());
+  const error = document.getElementById("error"), results = document.getElementById("results");
+  error.textContent = ""; results.hidden = true;
+  try {
+    const r = calculatePlan(values), metrics = document.getElementById("metrics");
+    metrics.replaceChildren(
+      metric("本次实际付款", money(r.price)),
+      metric("计划期现金支出", money(r.total), r.note),
+      metric("名义每 GB 成本", r.unitCost === null ? "无法计算" : `${money(r.unitCost)}/GB`),
+      metric("年付月均", r.annualMonthly === null ? "不适用" : money(r.annualMonthly), "仅供摊销比较，须一次付全年"),
+      metric("预计总需求", `${r.totalNeed.toFixed(2)} GB`)
+    );
+    document.getElementById("coverage").textContent = r.coverage;
+    document.getElementById("comparison").textContent = r.comparison ? `另一方式需付款 ${r.comparison.otherPayments} 次，合计 ${money(r.comparison.otherTotal)}；相对当前方式${r.comparison.difference >= 0 ? "多" : "少"}付 ${money(Math.abs(r.comparison.difference))}。仅在两种方式流量与服务条件一致时可比。` : "";
+    results.hidden = false;
+  } catch (err) { error.textContent = err.message; }
+});
+</script>
+</body>
+</html>
