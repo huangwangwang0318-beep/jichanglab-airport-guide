@@ -2,11 +2,11 @@
 
 ## 来源边界
 
-`data/plans.json` 首批数据来自项目委托方提供的 2026 年 10 月后台套餐**文字摘要**。本仓库目前未保存或公开原始截图，也未验证实时付款页。`observed_date` 记录为 `2026-10`，只表示已知月份；不补造具体日期。`source_type` 标识来源。未给出设备数、到期日、退款、流量重置等细节时，用 `null` 或 `unknown` 保留不确定性。所有金额是人民币历史标价，不含可能的优惠、手续费和续费变化。
+`data/plans.json` 中六家保留品牌的价格来自项目委托方提供的 2026 年 10 月后台套餐**文字摘要**。四家新增品牌目前只有邀请入口，金额、流量和付款周期均记为未知。本仓库目前未保存或公开原始截图，也未验证实时付款页。`observed_date` 记录为 `2026-10`，只表示已知月份；不补造具体日期。`source_type` 标识来源；`user_invitation_only` 只表示取得邀请入口，不构成价格证据。未给出设备数、到期日、退款、流量重置等细节时，用 `null` 或 `unknown` 保留不确定性。已记录金额是人民币历史标价，不含可能的优惠、手续费和续费变化。
 
 ## 字段解释
 
-- `billing_cycle` 是结算周期：`monthly`、`quarterly`、`semiannual`、`annual` 或 `one_time`。
+- `billing_cycle` 是结算周期：`monthly`、`quarterly`、`semiannual`、`annual`、`one_time` 或待核验的 `unknown`。
 - `traffic_reset_rule` 是额度重置：`monthly`、`fixed_total` 或 `unknown`。两者不能相互推断。
 - `traffic_gb` 在 `fixed_total` 下是整个有效期总量；在确认 `monthly` 下是每月额度。未知重置规则的月付记录仍不能作为“每月自动补流量”证据。
 - `validity_days` 只在摘要明确给出天数时填写。年付通常覆盖一年，但不因此伪造精确天数。
