@@ -104,7 +104,8 @@ class PlanDataTests(unittest.TestCase):
                 continue
             content = file.read_text(encoding="utf-8")
             urls += re.findall(r"https?://[^\s<>\]\)\"']+", content)
-        allowed_hosts = {"jichanglab.net", "json-schema.org", "wiki.metacubex.one"}
+        # Local preview addresses in the tool documentation are not outbound targets.
+        allowed_hosts = {"jichanglab.net", "json-schema.org", "wiki.metacubex.one", "127.0.0.1", "localhost"}
         from urllib.parse import urlsplit
         self.assertTrue(all(urlsplit(url).hostname in allowed_hosts for url in urls), urls)
 
