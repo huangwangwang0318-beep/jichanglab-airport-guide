@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>机场套餐成本计算器：月付、年付与一次性流量怎么选？ | JichangLab 开源工具</title>
+  <meta name="description" content="免费机场套餐成本计算器：输入月流量、使用月数、支付周期、套餐流量、节点倍率和设备数，比较月付、年付与一次性流量包的实际付款、预付浪费和使用成本。">
+  <meta name="theme-color" content="#f6f9fd">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="机场套餐成本计算器：月付、年付与一次性流量怎么选？">
+  <meta property="og:description" content="用真实预计用量和付款周期，比较两种套餐的现金支出；所有计算都在本地浏览器完成。">
+  <link rel="stylesheet" href="./assets/site.css">
+  <script type="module" src="./assets/app.js"></script>
+</head>
+<body>
+<a class="skip" href="#tool">跳到计算器</a>
+<header class="header"><div class="wrap nav">
+  <a class="logo" href="#tool" aria-label="返回计算器"><span class="symbol">J<span></span></span>Jichang<span class="logo-sub">Lab 工具</span></a>
+  <nav class="top-nav" aria-label="页面导航"><a href="#tool">计算器</a><a href="#method">计算说明</a><a href="#faq">常见问题</a></nav>
+</div></header>
+<main>
+  <section class="hero"><div class="wrap">
+    <nav class="crumb" aria-label="面包屑"><span>JichangLab 开源工具</span><span aria-hidden="true">/</span><span>机场套餐成本计算器</span></nav>
+    <div class="eyebrow"><span class="eyedot"></span> 免费开源工具 · 无需注册 · 浏览器本地计算</div>
+    <h1>机场套餐真实使用成本<span>计算器</span></h1>
+    <p class="intro">月付 ¥12 和年付 ¥120，哪个更划算？不能只看“月均价”。输入你的真实用量、使用时间和节点倍率，比较两套套餐的<strong>实际现金支出</strong>、<strong>流量是否够用</strong>和<strong>提前停用的预付成本</strong>。</p>
+    <div class="hero-points"><span>✓ 月付 / 季付 / 半年付 / 年付</span><span>✓ 一次性流量与有效期</span><span>✓ 节点流量倍率和设备限制</span></div>
+  </div></section>
+
+  <div class="wrap bodygrid" id="tool">
+    <div class="main-col">
+      <form id="calc-form" class="panel" novalidate>
+        <div class="section-head"><div><span class="micro">STEP 01</span><h2>先输入你的使用需求</h2></div><button id="example-btn" class="button ghost" type="button">载入示例</button></div>
+        <div class="fields fields-three">
+          <label>预计使用月数 <span class="help">按整月估算，1–36个月</span><input id="months" name="months" type="number" min="1" max="36" step="1" inputmode="numeric" value="12" required></label>
+          <label>每月实际用量 (GB) <span class="help">不含节点倍率</span><input id="usageGB" name="usageGB" type="number" min="0.01" max="50000" step="0.01" inputmode="decimal" value="50" required></label>
+          <label>同时使用的设备 <span class="help">用于检查设备上限</span><input id="devices" name="devices" type="number" min="1" max="50" step="1" inputmode="numeric" value="1" required></label>
+        </div>
+        <div class="section-head second"><div><span class="micro">STEP 02</span><h2>填写两套备选套餐</h2></div><span class="tip">价格填一次实际扣款金额</span></div>
+        <div class="plan-grid">
+          <fieldset class="plan plan-a"><legend><span class="plan-label">A</span> 套餐方案 A</legend>
+            <label>每次付款（元）<input name="a_price" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" value="12" required></label>
+            <label>付款周期<select name="a_type" data-choice="a"><option value="monthly">月付</option><option value="quarterly">季付</option><option value="semiannual">半年付</option><option value="annual">年付</option><option value="one_time">一次性流量</option></select></label>
+            <label>流量额度（GB）<input name="a_quotaGB" type="number" min="0.01" max="500000" step="0.01" inputmode="decimal" value="100" required></label>
+            <label data-reset="a">额度重置规则<select name="a_quotaMode"><option value="monthly">每月重置</option><option value="period">每付款周期固定总量</option><option value="unknown">尚未核实</option></select></label>
+            <label data-validity="a" hidden>一次性流量有效期（月）<input name="a_validityMonths" type="number" min="1" max="36" step="1" inputmode="numeric" value="2"></label>
+            <div class="row-two"><label>节点计费倍率<input name="a_trafficFactor" type="number" min="0.1" max="20" step="0.1" inputmode="decimal" value="1"></label><label>设备上限 <span class="help">未知可留空</span><input name="a_deviceLimit" type="number" min="1" max="999" step="1" inputmode="numeric" value="3"></label></div>
+          </fieldset>
+          <fieldset class="plan plan-b"><legend><span class="plan-label">B</span> 套餐方案 B</legend>
+            <label>每次付款（元）<input name="b_price" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" value="120" required></label>
+            <label>付款周期<select name="b_type" data-choice="b"><option value="monthly">月付</option><option value="quarterly">季付</option><option value="semiannual">半年付</option><option value="annual" selected>年付</option><option value="one_time">一次性流量</option></select></label>
+            <label>流量额度（GB）<input name="b_quotaGB" type="number" min="0.01" max="500000" step="0.01" inputmode="decimal" value="100" required></label>
+            <label data-reset="b">额度重置规则<select name="b_quotaMode"><option value="monthly">每月重置</option><option value="period">每付款周期固定总量</option><option value="unknown">尚未核实</option></select></label>
+            <label data-validity="b" hidden>一次性流量有效期（月）<input name="b_validityMonths" type="number" min="1" max="36" step="1" inputmode="numeric" value="2"></label>
+            <div class="row-two"><label>节点计费倍率<input name="b_trafficFactor" type="number" min="0.1" max="20" step="0.1" inputmode="decimal" value="1"></label><label>设备上限 <span class="help">未知可留空</span><input name="b_deviceLimit" type="number" min="1" max="999" step="1" inputmode="numeric" value="3"></label></div>
+          </fieldset>
+        </div>
+        <p class="note">注意：一次性套餐需要填写有效期，模型按有效期窗口估算补购，<strong>假设可重复购买</strong>；不自动假设有退款、流量结转或超额加购。</p>
+        <div class="actions"><button class="button primary" type="submit">计算实际成本 <span aria-hidden="true">→</span></button><button id="reset-btn" class="button secondary" type="button">重置条件</button><span id="form-error" class="error" role="alert" aria-live="polite"></span></div>
+      </form>
+      <section class="panel result-panel" aria-labelledby="result-heading" aria-live="polite">
+        <div class="section-head"><div><span class="micro">RESULTS</span><h2 id="result-heading">实际成本比较</h2></div><span class="updated">根据你的输入实时计算</span></div>
+        <div class="result-grid"><article class="result-card"><span class="r-top">方案 A</span><div id="a-status" class="status">待计算</div><div class="price" id="a-total">—</div><div class="stats"><span>预计付款次数 <b id="a-pays">—</b></span><span>平均每月现金支出 <b id="a-monthly">—</b></span><span>名义每已购1GB成本 <b id="a-nominal">—</b></span><span>每实际使用1GB成本 <b id="a-pergb">—</b></span><span>预付未使用月份 <b id="a-idle">—</b></span><span>按倍率计费流量 <b id="a-billed">—</b></span></div></article>
+        <article class="result-card"><span class="r-top">方案 B</span><div id="b-status" class="status">待计算</div><div class="price" id="b-total">—</div><div class="stats"><span>预计付款次数 <b id="b-pays">—</b></span><span>平均每月现金支出 <b id="b-monthly">—</b></span><span>名义每已购1GB成本 <b id="b-nominal">—</b></span><span>每实际使用1GB成本 <b id="b-pergb">—</b></span><span>预付未使用月份 <b id="b-idle">—</b></span><span>按倍率计费流量 <b id="b-billed">—</b></span></div></article></div>
+        <div class="verdict" id="verdict">输入条件后比较两种方案。</div><div id="warnings" class="warnings"></div>
+      </section>
+    </div>
+    <aside class="sidebar">
+      <section class="aside-card"><span class="micro">HOW TO USE</span><h2>3步看清真实支出</h2><ol><li><b>填真实付款</b><span>年付不要填“月均价”，应填全年一次扣款。</span></li><li><b>核对流量规则</b><span>每月重置与整期固定总量，结果完全不同。</span></li><li><b>比较总支出</b><span>只在满足流量及设备需求时比较价格。</span></li></ol></section>
+      <section class="aside-card blue-card"><span class="micro">IMPORTANT</span><h2>先确认条件，再下单</h2><p>工具只比较你填入的套餐规则，无法验证商家实际价格、网络速度、节点可用性、退款政策或邀请归因。</p><a href="#method" class="subtle-link">查看计算方法 <span aria-hidden="true">↗</span></a></section>
+    </aside>
+  </div>
+  <section class="wrap explain" id="method">
+    <h2>怎么算？不是只用价格除以流量</h2>
+    <div class="info-grid"><article><h3>按真实付款周期计算</h3><p>计划使用3个月：月付¥12预计支付¥36，年付¥120仍需一次支付¥120。计算器不会把年费拆成3个月收取。</p></article><article><h3>节点倍率要计入流量</h3><p>如果你每月实际使用50GB、倍率2倍，套餐将计费约100GB。额度不够的方案会提示“不满足”，而不是虚构额外购买价格。</p></article><article><h3>一次性流量与有效期</h3><p>一次性流量不等于每月自动重置。计算器按有效期分段估算购买数量，过期未用的流量不能带入下一段。</p></article></div>
+    <h2 id="faq">常见问题</h2>
+    <div class="faq"><details><summary>为什么年付折合每月很便宜，短期使用却更贵？</summary><p>因为年付需要预付全年金额，计划只使用几个月时，未使用的月份可能无法退回。工具按实际扣款金额比较。</p></details><details><summary>套餐写100GB，为什么输入50GB有时显示流量不够？</summary><p>节点倍率、流量是否每月重置、额度是否按付款周期累计都会影响结果。例如固定100GB/季度无法保证每月50GB的使用需求。</p></details><details><summary>为何设备数量未知时仍会显示计算金额？</summary><p>费用可以估算，但工具会显示设备上限未核实的提醒。付款前必须另行确认同时在线设备数，不能把模型估算当成商家承诺。</p></details><details><summary>一次性流量包为什么会计算多个购买次数？</summary><p>当一个有效期窗口内的总计费流量超过单包额度，模型会估计所需包数；不同窗口不能结转未用的流量。它假设可以多次购买，并不验证商家是否允许。</p></details><details><summary>需要上传订阅地址或账户吗？</summary><p>不需要。所有输入只用于浏览器本地计算。页面不需要外部脚本或数据接口，请不要输入自己的登录信息或订阅密钥。</p></details></div>
+    <p class="disclaimer">说明：结果属于条件模拟，不代表任何具体机场的实时报价、测速或服务保证。所有示例金额为假设数据，付款前应核实实际条款。本工具没有推广邀请链接，也不根据佣金排序。</p>
+  </section>
+</main>
+<footer class="footer"><div class="wrap foot"><span>© 2026 JichangLab 开源工具 · 机场套餐成本计算器</span><div><a href="#tool">返回计算器</a><a href="#method">计算方法</a><a href="#faq">常见问题</a></div></div></footer>
+</body></html>
