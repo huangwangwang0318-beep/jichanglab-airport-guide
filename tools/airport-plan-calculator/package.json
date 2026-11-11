@@ -1,0 +1,9 @@
+{
+  "name": "airport-plan-calculator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "本地运行的机场套餐真实使用成本计算器，无第三方依赖和推广数据",
+  "scripts": {"test": "node --test", "build": "node scripts/build.mjs", "check": "node scripts/build.mjs && node --test"},
+  "engines": {"node": ">=20"}
+}
