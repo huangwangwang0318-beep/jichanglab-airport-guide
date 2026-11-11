@@ -12,9 +12,10 @@ REQUIRED = {
     "traffic_gb", "traffic_reset_rule", "validity_days", "device_limit",
     "observed_date", "source_type",
 }
-CYCLES = {"monthly", "quarterly", "semiannual", "annual", "one_time"}
+CYCLES = {"monthly", "quarterly", "semiannual", "annual", "one_time", "unknown"}
 RESETS = {"monthly", "fixed_total", "unknown"}
-SOURCES = {"user_historical_summary", "verified_screenshot", "public_price_page"}
+SOURCES = {"user_historical_summary", "verified_screenshot", "public_price_page", "user_invitation_only"}
+PROVIDERS = {"六六云", "星辰VPN", "西游云", "山水云", "魔戒", "网际快车", "FlyBit", "超实惠加速", "乌龟云", "红杏云"}
 
 
 class PlanDataTests(unittest.TestCase):
@@ -48,6 +49,7 @@ class PlanDataTests(unittest.TestCase):
             self.assertIn(plan["traffic_reset_rule"], RESETS, plan)
             self.assertIn(plan["source_type"], SOURCES, plan)
             price = plan["price_cny"]
+        if price is not None:
             self.assertIsInstance(price, (int, float), plan)
             self.assertFalse(isinstance(price, bool), plan)
             self.assertTrue(math.isfinite(price) and price >= 0, plan)
@@ -77,18 +79,34 @@ class PlanDataTests(unittest.TestCase):
                 self.assertNotEqual(plan["billing_cycle"], "one_time", plan)
             if plan["traffic_reset_rule"] == "fixed_total" and plan["validity_days"] is not None:
                 self.assertGreater(plan["validity_days"], 0, plan)
-        by_id = {p["plan_id"]: p for p in self.plans}
-        self.assertEqual(by_id["yuetong-mini-annual"]["billing_cycle"], "annual")
-        self.assertEqual(by_id["yuetong-mini-annual"]["traffic_reset_rule"], "monthly")
         for plan in self.plans:
             if plan["provider"] == "山水云":
                 self.assertEqual(plan["traffic_reset_rule"], "fixed_total")
                 self.assertEqual(plan["validity_days"], 365)
 
     def test_ten_providers_and_source_provenance(self):
-        self.assertEqual(len({p["provider"] for p in self.plans}), 10)
-        self.assertTrue(all(p["observed_date"] == "2026-10" for p in self.plans))
-        self.assertTrue(all(p["source_type"] == "user_historical_summary" for p in self.plans))
+        self.assertEqual({p["provider"] for p in self.plans}, PROVIDERS)
+        for p in self.plans:
+            if p["provider"] in {"FlyBit", "超实惠加速", "乌龟云", "红杏云"}:
+                self.assertEqual(p["source_type"], "user_invitation_only")
+                self.assertIsNone(p["price_cny"])
+                self.assertIsNone(p["traffic_gb"])
+                self.assertEqual(p["billing_cycle"], "unknown")
+            else:
+                self.assertEqual(p["source_type"], "user_historical_summary")
+                self.assertEqual(p["observed_date"], "2026-10")
+
+    def test_no_unapproved_external_links_in_content(self):
+        """Current content must not retain links to exited brands."""
+        urls = []
+        for file in ROOT.rglob("*"):
+            if not file.is_file() or file.suffix not in {".md", ".html", ".json"}:
+                continue
+            content = file.read_text(encoding="utf-8")
+            urls += re.findall(r"https?://[^\s<>\]\)\"']+", content)
+        allowed_hosts = {"jichanglab.net", "json-schema.org", "wiki.metacubex.one"}
+        from urllib.parse import urlsplit
+        self.assertTrue(all(urlsplit(url).hostname in allowed_hosts for url in urls), urls)
 
 
 if __name__ == "__main__":
