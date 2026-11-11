@@ -1,0 +1,4 @@
+[
+ {"name":"月付与年付比较","scenario":{"months":12,"usageGB":50,"devices":1},"A":{"type":"monthly","price":12,"quotaGB":100,"quotaMode":"monthly","trafficFactor":1,"deviceLimit":3},"B":{"type":"annual","price":120,"quotaGB":100,"quotaMode":"monthly","trafficFactor":1,"deviceLimit":3},"expectedCostA":144,"expectedCostB":120},
+ {"name":"一次性有效期分窗","scenario":{"months":3,"usageGB":50,"devices":1},"A":{"type":"one_time","price":8,"quotaGB":60,"validityMonths":2,"trafficFactor":1,"deviceLimit":2},"expectedCostA":24}
+]
