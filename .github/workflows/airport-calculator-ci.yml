@@ -1,0 +1,22 @@
+name: Verify guide and calculator
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate brand data
+        run: python3 -m unittest discover -s tests -v
+      - name: Build and test calculator
+        working-directory: tools/airport-plan-calculator
+        run: npm run check
