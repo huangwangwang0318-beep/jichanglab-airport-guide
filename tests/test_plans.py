@@ -107,7 +107,8 @@ class PlanDataTests(unittest.TestCase):
         # Local preview addresses in the tool documentation are not outbound targets.
         allowed_hosts = {"jichanglab.net", "json-schema.org", "wiki.metacubex.one", "127.0.0.1", "localhost"}
         from urllib.parse import urlsplit
-        self.assertTrue(all(urlsplit(url).hostname in allowed_hosts for url in urls), urls)
+        pages_demo = "https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/"
+        self.assertTrue(all(url == pages_demo or urlsplit(url).hostname in allowed_hosts for url in urls), urls)
 
 
 if __name__ == "__main__":
