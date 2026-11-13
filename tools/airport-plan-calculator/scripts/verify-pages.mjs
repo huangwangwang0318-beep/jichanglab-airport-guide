@@ -28,17 +28,19 @@ assert.equal(
 );
 
 const html = readFileSync(resolve(site, 'index.html'), 'utf8');
+const canonical = '<link rel="canonical" href="https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/">';
 assert.match(html, /<title>[^<]*机场套餐成本计算器[^<]*<\/title>/);
 assert.match(html, /<meta name="description" content="[^"]+">/);
 assert.match(html, /<h1>机场套餐真实使用成本/);
 assert.match(html, /href="\.\/assets\/site\.css"/);
 assert.match(html, /src="\.\/assets\/app\.js"/);
 assert.doesNotMatch(html, /noindex/i);
+assert.equal(html.split(canonical).length, 2, 'The Pages demo must have exactly one self canonical URL.');
 assert.match(readFileSync(resolve(site, 'assets/app.js'), 'utf8'), /from '\.\/engine\.mjs'/);
 
 for (const file of expected) {
   const contents = readFileSync(resolve(site, file), 'utf8');
-  assert.doesNotMatch(contents, /https?:\/\/|\/\/[A-Za-z0-9.-]+\.[A-Za-z]{2,}/i, `${file} contains an external URL`);
+  assert.doesNotMatch(file === 'index.html' ? contents.replace(canonical, '') : contents, /https?:\/\/|\/\/[A-Za-z0-9.-]+\.[A-Za-z]{2,}/i, `${file} contains an external URL`);
   assert.doesNotMatch(contents, /\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket)\b/, `${file} contains a network API`);
 }
 
