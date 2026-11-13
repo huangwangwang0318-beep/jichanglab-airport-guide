@@ -1,0 +1,61 @@
+name: Deploy calculator demo to Pages
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/calculator-pages.yml'
+      - 'tools/airport-plan-calculator/**'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/calculator-pages.yml'
+      - 'tools/airport-plan-calculator/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: calculator-pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run existing brand tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Build and test calculator
+        working-directory: tools/airport-plan-calculator
+        run: npm run check
+      - name: Verify public Pages payload
+        working-directory: tools/airport-plan-calculator
+        run: node scripts/verify-pages.mjs
+      - name: Configure Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - name: Upload calculator site only
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: tools/airport-plan-calculator/site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy calculator to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
