@@ -1,4 +1,5 @@
 # Airport Plan Calculator & Subscription Cost Comparison
+**在线演示：**[打开免费计算器](https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/)；页面仅做本地计算，不含购买或邀请链接。
 
 **机场套餐成本计算器**是免费、开源的浏览器本地工具。输入真实付款金额、预计使用月数及每月流量，即可比较月付与年付的实际支出、一次性流量包成本、流量重置方式、节点倍率、有效期和设备限制。计算器不收集输入，也不包含购买、广告或联盟邀请功能。[查看源码与本地运行方法](tools/airport-plan-calculator/README.md)。
 
@@ -98,7 +99,7 @@ IEPL、IPLC 常被用作线路或产品名称，中转则描述流量先经过�
 
 ## 套餐成本计算器
 
-[升级版机场套餐成本计算器](tools/airport-plan-calculator/README.md)支持月付、季付、半年付、年付及一次性流量包，比较两种方案的完整现金支出、流量倍率、有效期、设备限制、名义每已购 GB 成本和每实际使用 GB 成本。它保留未知条件为“待核实”，不会把假设当成真实套餐报价。项目暂未发布在线演示，下载后按[本地预览说明](tools/airport-plan-calculator/docs/deployment.md)运行。
+[升级版机场套餐成本计算器](tools/airport-plan-calculator/README.md)支持月付、季付、半年付、年付及一次性流量包，比较两种方案的完整现金支出、流量倍率、有效期、设备限制、名义每已购 GB 成本和每实际使用 GB 成本。它保留未知条件为“待核实”，不会把假设当成真实套餐报价。在线演示已上线，下载后按[本地预览说明](tools/airport-plan-calculator/docs/deployment.md)运行。
 
 可复现示例：预计使用 12 个月、每月实际使用 50 GB、倍率 1、设备需求 1 台；A 月付 ¥12、B 年付一次 ¥120，两者均每月重置 100 GB，则 A 预计支出 ¥144、B 预计支出 ¥120。若只使用 3 个月，A 支出 ¥36，B 仍须预付 ¥120。详见[方法文档](tools/airport-plan-calculator/docs/methodology.md)和[自动测试](tools/airport-plan-calculator/tests/engine.test.mjs)。
 
