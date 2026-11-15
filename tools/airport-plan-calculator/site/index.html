@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>机场套餐成本计算器：月付、年付与一次性流量怎么选？ | JichangLab 开源工具</title>
   <meta name="description" content="免费机场套餐成本计算器：输入月流量、使用月数、支付周期、套餐流量、节点倍率和设备数，比较月付、年付与一次性流量包的实际付款、预付浪费和使用成本。">
+  <meta name="google-site-verification" content="4sgyzN_R3RS88ACTKTXdRBJKgLvfC2hhSwVb3UCXCmA">
+  <meta name="msvalidate.01" content="DCD6F10F89D8B57B2A922B5B54C1AF80">
   <link rel="canonical" href="https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/">
   <meta name="theme-color" content="#f6f9fd">
   <meta property="og:type" content="website">
@@ -74,6 +76,7 @@
   <section class="wrap explain" id="method">
     <h2>怎么算？不是只用价格除以流量</h2>
     <div class="info-grid"><article><h3>按真实付款周期计算</h3><p>计划使用3个月：月付¥12预计支付¥36，年付¥120仍需一次支付¥120。计算器不会把年费拆成3个月收取。</p></article><article><h3>节点倍率要计入流量</h3><p>如果你每月实际使用50GB、倍率2倍，套餐将计费约100GB。额度不够的方案会提示“不满足”，而不是虚构额外购买价格。</p></article><article><h3>一次性流量与有效期</h3><p>一次性流量不等于每月自动重置。计算器按有效期分段估算购买数量，过期未用的流量不能带入下一段。</p></article></div>
+    <p class="disclaimer">需要核对实际付款、流量重置和有效期时，可参考 <a href="https://jichanglab.net/compare/">套餐比较资料</a>。该外部资料站与本项目存在商业关联；本计算器可独立使用，不包含购买或邀请入口。</p>
     <h2 id="faq">常见问题</h2>
     <div class="faq"><details><summary>为什么年付折合每月很便宜，短期使用却更贵？</summary><p>因为年付需要预付全年金额，计划只使用几个月时，未使用的月份可能无法退回。工具按实际扣款金额比较。</p></details><details><summary>套餐写100GB，为什么输入50GB有时显示流量不够？</summary><p>节点倍率、流量是否每月重置、额度是否按付款周期累计都会影响结果。例如固定100GB/季度无法保证每月50GB的使用需求。</p></details><details><summary>为何设备数量未知时仍会显示计算金额？</summary><p>费用可以估算，但工具会显示设备上限未核实的提醒。付款前必须另行确认同时在线设备数，不能把模型估算当成商家承诺。</p></details><details><summary>一次性流量包为什么会计算多个购买次数？</summary><p>当一个有效期窗口内的总计费流量超过单包额度，模型会估计所需包数；不同窗口不能结转未用的流量。它假设可以多次购买，并不验证商家是否允许。</p></details><details><summary>需要上传订阅地址或账户吗？</summary><p>不需要。所有输入只用于浏览器本地计算。页面不需要外部脚本或数据接口，请不要输入自己的登录信息或订阅密钥。</p></details></div>
     <p class="disclaimer">说明：结果属于条件模拟，不代表任何具体机场的实时报价、测速或服务保证。所有示例金额为假设数据，付款前应核实实际条款。本工具没有推广邀请链接，也不根据佣金排序。</p>
