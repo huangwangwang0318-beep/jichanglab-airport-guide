@@ -97,18 +97,53 @@ class PlanDataTests(unittest.TestCase):
                 self.assertEqual(p["observed_date"], "2026-10")
 
     def test_no_unapproved_external_links_in_content(self):
-        """Current content must not retain links to exited brands."""
-        urls = []
+        """The open-source demo must stay clean; commercial source uses exact invitation URLs."""
+        from urllib.parse import urlsplit
+        commercial = ROOT / "commercial-site"
+        approved = set(json.loads((commercial / "affiliate-links.json").read_text(encoding="utf-8")).values())
+        self.assertEqual(len(approved), 10)
+        allowed_hosts = {"jichanglab.net", "json-schema.org", "wiki.metacubex.one", "127.0.0.1", "localhost"}
+        pages_demo = "https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/"
         for file in ROOT.rglob("*"):
             if not file.is_file() or file.suffix not in {".md", ".html", ".json"}:
                 continue
             content = file.read_text(encoding="utf-8")
-            urls += re.findall(r"https?://[^\s<>\]\)\"']+", content)
-        # Local preview addresses in the tool documentation are not outbound targets.
-        allowed_hosts = {"jichanglab.net", "json-schema.org", "wiki.metacubex.one", "127.0.0.1", "localhost"}
-        from urllib.parse import urlsplit
-        pages_demo = "https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/"
-        self.assertTrue(all(url == pages_demo or urlsplit(url).hostname in allowed_hosts for url in urls), urls)
+            urls = re.findall(r"https?://[^\s<>\]\)\"']+", content)
+            if commercial in file.parents:
+                self.assertTrue(all(url in approved for url in urls), (file, urls))
+            else:
+                self.assertTrue(all(url == pages_demo or urlsplit(url).hostname in allowed_hosts for url in urls), (file, urls))
+
+    def test_commercial_pages_and_exact_affiliate_targets(self):
+        """All ten brands have real pages, and every outbound CTA is approved and sponsored."""
+        from html.parser import HTMLParser
+        class LinkParser(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.links = []
+            def handle_starttag(self, tag, attrs):
+                if tag == "a":
+                    self.links.append(dict(attrs))
+        commercial = ROOT / "commercial-site"
+        approved = set(json.loads((commercial / "affiliate-links.json").read_text(encoding="utf-8")).values())
+        pages = sorted(commercial.rglob("index.html"))
+        self.assertEqual(len(pages), 11)
+        outbound = set()
+        for page in pages:
+            content = page.read_text(encoding="utf-8")
+            self.assertEqual(content.count("<h1"), 1, page)
+            parser = LinkParser()
+            parser.feed(content)
+            for a in parser.links:
+                href = a.get("href", "")
+                if href.startswith(("http://", "https://")):
+                    self.assertIn(href, approved, (page, href))
+                    self.assertIn("sponsored", a.get("rel", "").split(), page)
+                    outbound.add(href)
+        self.assertEqual(outbound, approved)
+        for filename in ("commercial-site/assets/app.js", "commercial-site/assets/site.css"):
+            text = (ROOT / filename).read_text(encoding="utf-8")
+            self.assertNotRegex(text, r"https?://|fetch\(|XMLHttpRequest|sendBeacon")
 
 
 if __name__ == "__main__":
