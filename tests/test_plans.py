@@ -109,8 +109,11 @@ class PlanDataTests(unittest.TestCase):
                 continue
             content = file.read_text(encoding="utf-8")
             urls = re.findall(r"https?://[^\s<>\]\)\"']+", content)
+            published = ROOT / "tools" / "airport-plan-calculator" / "site"
             if commercial in file.parents:
                 self.assertTrue(all(url in approved for url in urls), (file, urls))
+            elif published in file.parents:
+                self.assertTrue(all(url in approved or url.startswith(pages_demo) for url in urls), (file, urls))
             else:
                 self.assertTrue(all(url == pages_demo or urlsplit(url).hostname in allowed_hosts for url in urls), (file, urls))
 
