@@ -73,3 +73,35 @@ export function matchHistoricalBrands(plans, {months, usageGB, targetTotalYuan, 
   }
   return matches;
 }
+
+/**
+ * A/B amount selection is driven by the user's most recently changed form.
+ * This prevents the previous bug where editing A did not affect matching if B
+ * was still the less expensive plan. Explicit modes always override auto mode.
+ */
+export function selectMatchingBudget(result,{mode='auto',lastEditedPlan=null,manualAmount=null}={}){
+ const viable=key=>result?.[key]?.viable && Number.isFinite(result[key].totalYuan) && result[key].totalYuan>0;
+ if(mode==='manual'){
+   const n=Number(manualAmount);
+   if(manualAmount===''||manualAmount===null||!Number.isFinite(n)||n<0.01||n>1000000)
+     return {value:null,label:'自定义预算',reason:'请输入有效的总预算金额（0.01–1000000元）'};
+   return {value:round2(n),label:'手动输入的总预算'};
+ }
+ if(mode==='a'||mode==='b'){
+   const k=mode.toUpperCase();
+   return viable(k)?{value:result[k].totalYuan,label:'方案 '+k+' 的本次总支出'}
+     :{value:null,label:'方案 '+k,reason:'方案 '+k+' 不满足输入的已知条件，无法用于品牌金额匹配'};
+ }
+ if(mode==='auto'&&(lastEditedPlan==='a'||lastEditedPlan==='b')){
+   const k=lastEditedPlan.toUpperCase();
+   return viable(k)?{value:result[k].totalYuan,label:'刚修改的方案 '+k+' 的本次总支出'}
+     :{value:null,label:'方案 '+k,reason:'刚修改的方案 '+k+' 未满足已知条件，请修改条件或选择另一种匹配金额'};
+ }
+ if(mode==='auto'||mode==='lower'){
+   const options=['A','B'].filter(viable).sort((a,b)=>result[a].totalYuan-result[b].totalYuan);
+   if(!options.length)return {value:null,label:'可用方案',reason:'A、B两种方案都未满足输入条件，暂无可用于匹配的参考金额'};
+   const key=options[0];
+   return {value:result[key].totalYuan,label:'方案 '+key+' 的较低总支出'};
+ }
+ return {value:null,label:'未知模式',reason:'请选择正确的匹配方式'};
+}
