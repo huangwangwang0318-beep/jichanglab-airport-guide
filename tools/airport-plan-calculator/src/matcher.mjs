@@ -50,15 +50,19 @@ export function matchHistoricalBrands(plans, {months, usageGB, targetTotalYuan, 
     eligible.push({
       provider:p.provider,slug:BRAND_SLUGS[p.provider],planName:p.plan_name,
       approximateYuan:amount,months,withinReference:amount<=targetTotalYuan+0.005,
+      budgetDifferenceYuan:round2(targetTotalYuan-amount),
+      budgetDistancePercent:round2(Math.abs(targetTotalYuan-amount)/targetTotalYuan*100),
       caveat,sourceDate:p.observed_date
     });
   }
-  // Keep the closest historical plan per provider. Favor <= reference, then proximity.
+  // Rank by *this calculation's* target amount, not a fixed brand order.
+  // A slightly over-budget option is shown explicitly as over-budget,
+  // rather than silently replacing it with a much cheaper, unrelated one.
   const ranking=(a,b)=>{
+    const distance=a.budgetDistancePercent-b.budgetDistancePercent;
+    if(Math.abs(distance)>0.000001)return distance;
     if(a.withinReference!==b.withinReference)return a.withinReference?-1:1;
-    const gapA=Math.abs(a.approximateYuan-targetTotalYuan);
-    const gapB=Math.abs(b.approximateYuan-targetTotalYuan);
-    return gapA-gapB||a.approximateYuan-b.approximateYuan||a.provider.localeCompare(b.provider,'zh-CN');
+    return a.approximateYuan-b.approximateYuan||a.provider.localeCompare(b.provider,'zh-CN');
   };
   eligible.sort(ranking);
   const seen=new Set(), matches=[];
