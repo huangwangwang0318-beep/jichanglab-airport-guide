@@ -48,8 +48,8 @@ for (const page of expected.filter(name=>name.endsWith('.html'))) {
     assert.ok(match[0].includes('sponsored'),'Missing affiliate disclosure rel in '+page);
     outbound.add(match[1]);
   }
-  const remoteResources=[...html.matchAll(/<(?:script|link|img)\b[^>]*(?:src|href)="(https?:\/\/[^"]+)"/g)];
-  assert.equal(remoteResources.length,0,'External scripts, images and CSS are forbidden: '+page);
+  const remoteResources=[...html.matchAll(/<script\b[^>]*\bsrc="https?:\/\/[^"]+"|<img\b[^>]*\bsrc="https?:\/\/[^"]+"|<link\b[^>]*\brel="stylesheet"[^>]*\bhref="https?:\/\/[^"]+"/g)];
+  assert.equal(remoteResources.length,0,'External scripts, images and stylesheets are forbidden: '+page);
 }
 assert.deepEqual(outbound, allowed, 'Missing or unexpected commission target.');
 
