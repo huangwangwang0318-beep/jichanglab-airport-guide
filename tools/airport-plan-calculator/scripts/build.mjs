@@ -7,6 +7,13 @@ const site = resolve(project, 'site');
 const commercial = resolve(repo, 'commercial-site');
 
 copyFileSync(resolve(project, 'src/engine.mjs'), resolve(site, 'assets/engine.mjs'));
+copyFileSync(resolve(project, 'src/matcher.mjs'), resolve(site, 'assets/matcher.mjs'));
+const historicalPlans = JSON.parse(readFileSync(resolve(repo, 'data/plans.json'),'utf8'));
+writeFileSync(resolve(site,'assets/plan-data.mjs'),
+  '// Generated from repository historical data by scripts/build.mjs. No network requests.\n' +
+  'export const historicalPlans = Object.freeze(' + JSON.stringify(historicalPlans) + ');\n',
+  'utf8');
+
 copyFileSync(resolve(commercial, 'assets/site.css'), resolve(site, 'assets/brand.css'));
 
 const brandList = [
