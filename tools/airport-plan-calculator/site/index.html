@@ -87,7 +87,21 @@
             <div><span class="micro">NEXT STEP · 站内选购</span><h3 id="price-match-heading">按预计金额匹配品牌</h3></div>
             <a class="match-all" href="#brands">查看全部10家品牌</a>
           </div>
-          <p id="match-summary" class="match-summary">完成费用计算后，显示接近预计付款金额的品牌资料。</p>
+          <div class="match-controls">
+            <label for="match-source">匹配金额来自哪里？
+              <select id="match-source">
+                <option value="auto">自动跟随最后修改的 A / B 方案</option>
+                <option value="a">按方案 A 本次计算总额</option>
+                <option value="b">按方案 B 本次计算总额</option>
+                <option value="lower">按 A / B 中较低的总额</option>
+                <option value="manual">自己输入总预算</option>
+              </select>
+            </label>
+            <label id="manual-budget-label" for="manual-budget" hidden>总预算（人民币元）
+              <input id="manual-budget" type="number" min="0.01" max="1000000" step="0.01" inputmode="decimal" value="120">
+            </label>
+          </div>
+          <p id="match-summary" class="match-summary">每次改变金额或使用条件，这里的匹配品牌、预算差额都会重新计算。</p>
           <div id="match-list" class="match-list" aria-live="polite"></div>
           <p class="match-note">仅依据 2026 年 10 月历史报价及明确的计费方式作金额筛选；并非商家现价、服务质量排名或已验证的流量／设备适配。没有可靠价格的品牌仍可在下方目录查看。</p>
         </section>
