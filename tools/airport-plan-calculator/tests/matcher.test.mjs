@@ -58,7 +58,7 @@ test('even when a brand stays matched, budget gap changes with every price chang
  const a=matchHistoricalBrands(plans,{...query,targetTotalYuan:120})[0];
  const b=matchHistoricalBrands(plans,{...query,targetTotalYuan:121})[0];
  assert.equal(a.provider,b.provider);
- assert.equal(b.budgetDifferenceYuan-a.budgetDifferenceYuan,1);
+ assert.equal(b.budgetDifferenceCents-a.budgetDifferenceCents,100);
 });
 test('changing usage months recalculates provider total rather than fixing a quote',()=>{
  const a=matchHistoricalBrands(plans,{months:3,usageGB:50,targetTotalYuan:30,maxResults:5});
