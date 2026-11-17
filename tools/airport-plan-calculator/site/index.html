@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>机场套餐成本计算器：月付、年付与一次性流量怎么选？ | JichangLab 开源工具</title>
+  <title>机场套餐成本计算器与10家品牌费用参考 | JichangLab</title>
   <meta name="description" content="免费机场套餐成本计算器：输入月流量、使用月数、支付周期、套餐流量、节点倍率和设备数，比较月付、年付与一次性流量包的实际付款、预付浪费和使用成本。">
   <meta name="google-site-verification" content="4sgyzN_R3RS88ACTKTXdRBJKgLvfC2hhSwVb3UCXCmA">
   <meta name="msvalidate.01" content="DCD6F10F89D8B57B2A922B5B54C1AF80">
@@ -14,12 +14,28 @@
   <meta property="og:description" content="用真实预计用量和付款周期，比较两种套餐的现金支出；所有计算都在本地浏览器完成。">
   <link rel="stylesheet" href="./assets/site.css">
   <script type="module" src="./assets/app.js"></script>
+<style>
+.provider-section{padding-top:32px;padding-bottom:32px}
+.provider-section>p{color:#566781;line-height:1.75}
+.provider-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.provider-card{min-width:0;border:1px solid #dce5f4;border-radius:14px;background:#fff;padding:20px;box-shadow:0 5px 18px rgba(25,55,110,.06)}
+.provider-card h3{margin:6px 0 7px;font-size:20px}
+.provider-card h3 a{color:#1d56a4}
+.provider-card p{font-size:14px;color:#5a6c84;line-height:1.7}
+.provider-theme{font-size:12px;font-weight:800;color:#3264aa}
+.provider-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+.provider-actions a{font-size:14px;font-weight:750;border-radius:9px;padding:10px 13px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.provider-details{background:#eff4fd;color:#1d55a6}
+.provider-cta{background:#225eb5;color:#fff}
+.provider-disclosure{font-size:13px}
+@media(max-width:660px){.provider-grid{grid-template-columns:1fr}.provider-card{padding:16px}}
+</style>
 </head>
 <body>
 <a class="skip" href="#tool">跳到计算器</a>
 <header class="header"><div class="wrap nav">
   <a class="logo" href="#tool" aria-label="返回计算器"><span class="symbol">J<span></span></span>Jichang<span class="logo-sub">Lab 工具</span></a>
-  <nav class="top-nav" aria-label="页面导航"><a href="#tool">计算器</a><a href="#method">计算说明</a><a href="#faq">常见问题</a></nav>
+  <nav class="top-nav" aria-label="页面导航"><a href="#tool">计算器</a><a href="#brands">品牌目录</a><a href="#method">计算说明</a><a href="#faq">常见问题</a></nav>
 </div></header>
 <main>
   <section class="hero"><div class="wrap">
@@ -73,13 +89,29 @@
       <section class="aside-card blue-card"><span class="micro">IMPORTANT</span><h2>先确认条件，再下单</h2><p>工具只比较你填入的套餐规则，无法验证商家实际价格、网络速度、节点可用性、退款政策或邀请归因。</p><a href="#method" class="subtle-link">查看计算方法 <span aria-hidden="true">↗</span></a></section>
     </aside>
   </div>
-  <section class="wrap explain" id="method">
+  
+<section id="brands" class="wrap provider-section" aria-labelledby="brands-h">
+  <div class="section-head"><div><span class="micro">BRAND GUIDES</span><h2 id="brands-h">10 家机场品牌：独立资料与注册入口</h2></div></div>
+  <p>先在上方计算器算清付款成本，再参考每家品牌的独立资料。这里的历史套餐并非实时售价，品牌顺序不代表网络质量或测速排名。</p>
+  <div class="provider-grid"><article class="provider-card"><span class="provider-theme">月付与一次性大流量</span><h3><a href="./brands/liuliuyun/">六六云</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/liuliuyun/">查看品牌详情</a><a class="provider-cta" href="https://66jc.xyz/#/register?code=VOExoejb" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">多档月付流量</span><h3><a href="./brands/xingchen/">星辰VPN</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/xingchen/">查看品牌详情</a><a class="provider-cta" href="https://xc1.luniu8.com/?code=R9T4kQjR" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">120–500GB 月付选择</span><h3><a href="./brands/xiyouyun/">西游云</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/xiyouyun/">查看品牌详情</a><a class="provider-cta" href="https://e.xiyou666.xyz/?code=6QV5l9nT" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">365天固定总流量</span><h3><a href="./brands/shanshuiyun/">山水云</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/shanshuiyun/">查看品牌详情</a><a class="provider-cta" href="https://216.236.63.231/#/register?code=Fj5nMMFK" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">一次性流量成本</span><h3><a href="./brands/mojie/">魔戒</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/mojie/">查看品牌详情</a><a class="provider-cta" href="https://mojie.app/register?aff=fV5N1vwa" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">小额度单次流量</span><h3><a href="./brands/wangjikuache/">网际快车</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/wangjikuache/">查看品牌详情</a><a class="provider-cta" href="https://dxcfpv.xn--66tw07h.com" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">付款规则与套餐说明</span><h3><a href="./brands/flybit/">FlyBit</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/flybit/">查看品牌详情</a><a class="provider-cta" href="https://goflybit.com/register?code=bI8axzN2k3" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">初次付款与续费</span><h3><a href="./brands/chaoshihui/">超实惠加速</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/chaoshihui/">查看品牌详情</a><a class="provider-cta" href="https://cshjc.net/register?code=IT1H2XNo" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">设备与套餐匹配</span><h3><a href="./brands/wuguiyun/">乌龟云</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/wuguiyun/">查看品牌详情</a><a class="provider-cta" href="https://wuguijiasu.com/#/login?code=rdf0Vi1H" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article>
+<article class="provider-card"><span class="provider-theme">使用周期与流量额度</span><h3><a href="./brands/hongxingyun/">红杏云</a></h3><p>查看独立品牌资料、历史参考套餐与购买前核查要点。</p><div class="provider-actions"><a class="provider-details" href="./brands/hongxingyun/">查看品牌详情</a><a class="provider-cta" href="https://hxlove21s.cc/web/#/login?code=KA9eyGxh" rel="sponsored nofollow noopener noreferrer" target="_blank">查看套餐与注册</a></div></article></div>
+  <p class="provider-disclosure">推广披露：本站可能因以下专属邀请链接的注册或购买获得佣金，计算器的比较结果不按佣金排序。出现浏览器危险网站或证书警告时，请不要绕过。</p>
+</section>
+<section class="wrap explain" id="method">
     <h2>怎么算？不是只用价格除以流量</h2>
     <div class="info-grid"><article><h3>按真实付款周期计算</h3><p>计划使用3个月：月付¥12预计支付¥36，年付¥120仍需一次支付¥120。计算器不会把年费拆成3个月收取。</p></article><article><h3>节点倍率要计入流量</h3><p>如果你每月实际使用50GB、倍率2倍，套餐将计费约100GB。额度不够的方案会提示“不满足”，而不是虚构额外购买价格。</p></article><article><h3>一次性流量与有效期</h3><p>一次性流量不等于每月自动重置。计算器按有效期分段估算购买数量，过期未用的流量不能带入下一段。</p></article></div>
-    <p class="disclaimer">需要核对实际付款、流量重置和有效期时，可参考 <a href="https://jichanglab.net/compare/">套餐比较资料</a>。该外部资料站与本项目存在商业关联；本计算器可独立使用，不包含购买或邀请入口。</p>
+    <p class="disclaimer">需要核对实际付款、流量重置和有效期时，可参考 本站品牌独立资料。该外部资料站与本项目存在商业关联；本计算器可独立使用，不包含购买或邀请入口。</p>
     <h2 id="faq">常见问题</h2>
     <div class="faq"><details><summary>为什么年付折合每月很便宜，短期使用却更贵？</summary><p>因为年付需要预付全年金额，计划只使用几个月时，未使用的月份可能无法退回。工具按实际扣款金额比较。</p></details><details><summary>套餐写100GB，为什么输入50GB有时显示流量不够？</summary><p>节点倍率、流量是否每月重置、额度是否按付款周期累计都会影响结果。例如固定100GB/季度无法保证每月50GB的使用需求。</p></details><details><summary>为何设备数量未知时仍会显示计算金额？</summary><p>费用可以估算，但工具会显示设备上限未核实的提醒。付款前必须另行确认同时在线设备数，不能把模型估算当成商家承诺。</p></details><details><summary>一次性流量包为什么会计算多个购买次数？</summary><p>当一个有效期窗口内的总计费流量超过单包额度，模型会估计所需包数；不同窗口不能结转未用的流量。它假设可以多次购买，并不验证商家是否允许。</p></details><details><summary>需要上传订阅地址或账户吗？</summary><p>不需要。所有输入只用于浏览器本地计算。页面不需要外部脚本或数据接口，请不要输入自己的登录信息或订阅密钥。</p></details></div>
-    <p class="disclaimer">说明：结果属于条件模拟，不代表任何具体机场的实时报价、测速或服务保证。所有示例金额为假设数据，付款前应核实实际条款。本工具没有推广邀请链接，也不根据佣金排序。</p>
+    <p class="disclaimer">说明：结果属于条件模拟，不代表任何具体机场的实时报价、测速或服务保证。所有示例金额为假设数据，付款前应核实实际条款。计算结果仅根据用户的输入条件得出，不按照佣金排序；本站另有带推广披露的品牌注册链接。</p>
   </section>
 </main>
 <footer class="footer"><div class="wrap foot"><span>© 2026 JichangLab 开源工具 · 机场套餐成本计算器</span><div><a href="#tool">返回计算器</a><a href="#method">计算方法</a><a href="#faq">常见问题</a></div></div></footer>

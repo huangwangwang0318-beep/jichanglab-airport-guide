@@ -4,53 +4,59 @@ import {resolve, relative} from 'node:path';
 import {execFileSync} from 'node:child_process';
 
 const project = resolve(import.meta.dirname, '..');
+const repoRoot = resolve(project, '../..');
 const site = resolve(project, 'site');
-const expected = [
-  'assets/app.js',
-  'assets/engine.mjs',
-  'assets/site.css',
-  'index.html',
-];
+const base = 'https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/';
+const names = ['liuliuyun','xingchen','xiyouyun','shanshuiyun','mojie','wangjikuache','flybit','chaoshihui','wuguiyun','hongxingyun'];
+const allowed = new Set(Object.values(JSON.parse(readFileSync(resolve(repoRoot,'commercial-site/affiliate-links.json'),'utf8'))));
+assert.equal(allowed.size, 10, 'Exactly ten approved external invitation targets are required.');
 
-function filesIn(directory) {
-  return readdirSync(directory, {withFileTypes: true}).flatMap((entry) => {
-    const path = resolve(directory, entry.name);
-    assert.ok(!entry.isSymbolicLink(), `Pages payload contains a symlink: ${path}`);
-    return entry.isDirectory() ? filesIn(path) : [relative(site, path).replaceAll('\\', '/')];
+const expected = [
+  'assets/app.js','assets/brand.css','assets/engine.mjs','assets/site.css','index.html','sitemap.xml',
+  ...names.map(slug => 'brands/' + slug + '/index.html')
+];
+function fileList(dir) {
+  return readdirSync(dir, {withFileTypes:true}).flatMap(entry => {
+    const path = resolve(dir, entry.name);
+    assert.ok(!entry.isSymbolicLink(), 'Symlink not allowed in published Pages payload: ' + path);
+    return entry.isDirectory() ? fileList(path) : [relative(site,path).replaceAll('\\\\','/')];
   });
 }
+assert.deepEqual(fileList(site).sort(), expected.sort(), 'Unexpected or missing Pages files.');
+assert.equal(readFileSync(resolve(site,'assets/engine.mjs'),'utf8'), readFileSync(resolve(project,'src/engine.mjs'),'utf8'));
 
-assert.deepEqual(filesIn(site).sort(), expected);
-assert.equal(
-  readFileSync(resolve(site, 'assets/engine.mjs'), 'utf8'),
-  readFileSync(resolve(project, 'src/engine.mjs'), 'utf8'),
-  'The published engine must match the tested source.',
-);
+const home = readFileSync(resolve(site,'index.html'),'utf8');
+assert.ok(home.includes('name="google-site-verification"'), 'Google verification must remain.');
+assert.ok(home.includes('name="msvalidate.01"'), 'Bing verification must remain.');
+assert.ok(home.includes('id="brands"'), 'Brand directory is missing from homepage.');
+assert.ok(home.includes('<link rel="canonical" href="' + base + '">'), 'Homepage canonical mismatch.');
+assert.ok(!home.includes('本工具没有推广邀请链接'), 'Obsolete no-affiliate statement found.');
+const xml = readFileSync(resolve(site, 'sitemap.xml'),'utf8');
+const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m=>m[1]);
+assert.deepEqual(locations, [base, ...names.map(n => base + 'brands/' + n + '/')]);
 
-const html = readFileSync(resolve(site, 'index.html'), 'utf8');
-const canonical = '<link rel="canonical" href="https://huangwangwang0318-beep.github.io/jichanglab-airport-guide/">';
-const comparisonUrl = 'https://jichanglab.net/compare/';
-assert.match(html, /<title>[^<]*机场套餐成本计算器[^<]*<\/title>/);
-assert.match(html, /<meta name="description" content="[^"]+">/);
-assert.match(html, /<h1>机场套餐真实使用成本/);
-assert.match(html, /href="\.\/assets\/site\.css"/);
-assert.match(html, /src="\.\/assets\/app\.js"/);
-assert.doesNotMatch(html, /noindex/i);
-assert.equal(html.split(canonical).length, 2, 'The Pages demo must have exactly one self canonical URL.');
-assert.equal(html.split(`<a href="${comparisonUrl}">`).length, 2, 'The comparison resource must have exactly one clickable link.');
-assert.equal(html.split(comparisonUrl).length, 2, 'The comparison URL must occur exactly once.');
-assert.match(html, /<meta name="google-site-verification" content="[^"]+">/);
-assert.match(html, /<meta name="msvalidate\.01" content="[^"]+">/);
-assert.match(readFileSync(resolve(site, 'assets/app.js'), 'utf8'), /from '\.\/engine\.mjs'/);
-
-for (const file of expected) {
-  const contents = readFileSync(resolve(site, file), 'utf8');
-  assert.doesNotMatch(file === 'index.html' ? contents.replace(canonical, '').replace(comparisonUrl, '') : contents, /https?:\/\/|\/\/[A-Za-z0-9.-]+\.[A-Za-z]{2,}/i, `${file} contains an unapproved external URL`);
-  assert.doesNotMatch(contents, /\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket)\b/, `${file} contains a network API`);
+const outbound = new Set();
+for (const page of expected.filter(name=>name.endsWith('.html'))) {
+  const html=readFileSync(resolve(site,page),'utf8');
+  assert.equal((html.match(/<h1\b/g)||[]).length,1,'Exactly one H1 on '+page);
+  assert.ok(!html.includes('noindex'),'Unindexable: '+page);
+  const canonical=base+(page==='index.html'?'':page.replace(/index\.html$/,''));
+  assert.ok(html.includes('<link rel="canonical" href="'+canonical+'">'),'Bad canonical: '+page);
+  const links=[...html.matchAll(/<a\b[^>]*href="(https?:\/\/[^"]+)"[^>]*>/g)];
+  for(const match of links) {
+    assert.ok(allowed.has(match[1]),'Unapproved clickable external URL in '+page+': '+match[1]);
+    assert.ok(match[0].includes('sponsored'),'Missing affiliate disclosure rel in '+page);
+    outbound.add(match[1]);
+  }
+  const remoteResources=[...html.matchAll(/<script\b[^>]*\bsrc="https?:\/\/[^"]+"|<img\b[^>]*\bsrc="https?:\/\/[^"]+"|<link\b[^>]*\brel="stylesheet"[^>]*\bhref="https?:\/\/[^"]+"/g)];
+  assert.equal(remoteResources.length,0,'External scripts, images and stylesheets are forbidden: '+page);
 }
+assert.deepEqual(outbound, allowed, 'Missing or unexpected commission target.');
 
-for (const script of ['assets/app.js', 'assets/engine.mjs']) {
-  execFileSync(process.execPath, ['--check', resolve(site, script)], {stdio: 'pipe'});
+for(const file of ['assets/app.js','assets/engine.mjs','assets/site.css','assets/brand.css']){
+  const content=readFileSync(resolve(site,file),'utf8');
+  assert.ok(!/\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket)\b/.test(content),file+' tries to access a network API');
 }
-
-console.log(`Pages payload verified: ${expected.join(', ')}`);
+for(const file of ['assets/app.js','assets/engine.mjs'])
+  execFileSync(process.execPath,['--check',resolve(site,file)],{stdio:'pipe'});
+console.log('Pages verified: 11 indexable HTML pages, 10 exact affiliate URLs, verification meta and sitemap.');
