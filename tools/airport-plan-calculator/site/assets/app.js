@@ -67,7 +67,7 @@ function renderMatches(res,scenario){
     const amount=document.createElement('div');amount.className='match-amount';
     amount.textContent=currency(m.approximateYuan)+' / '+m.months+'个月历史估算';
     const delta=document.createElement('div');delta.className='match-diff';
-    delta.textContent=(m.withinReference?'比当前预算少 ':'比当前预算多 ')+currency(Math.abs(m.budgetDifferenceYuan));
+    delta.textContent=(m.withinReference?'比当前预算少 ':'比当前预算多 ')+currency(Math.abs(m.budgetDifferenceCents)/100);
     const desc=document.createElement('p');desc.className='match-description';
     desc.textContent=m.planName+' · '+m.caveat+'。资料日期：'+m.sourceDate;
     const link=document.createElement('a');link.className='match-link';
