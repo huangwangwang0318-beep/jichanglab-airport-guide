@@ -12,7 +12,7 @@ const allowed = new Set(Object.values(JSON.parse(readFileSync(resolve(repoRoot,'
 assert.equal(allowed.size, 10, 'Exactly ten approved external invitation targets are required.');
 
 const expected = [
-  'assets/app.js','assets/brand.css','assets/engine.mjs','assets/site.css','index.html','sitemap.xml',
+  'assets/app.js','assets/brand.css','assets/engine.mjs','assets/matcher.mjs','assets/plan-data.mjs','assets/site.css','index.html','sitemap.xml',
   ...names.map(slug => 'brands/' + slug + '/index.html')
 ];
 function fileList(dir) {
@@ -24,11 +24,19 @@ function fileList(dir) {
 }
 assert.deepEqual(fileList(site).sort(), expected.sort(), 'Unexpected or missing Pages files.');
 assert.equal(readFileSync(resolve(site,'assets/engine.mjs'),'utf8'), readFileSync(resolve(project,'src/engine.mjs'),'utf8'));
+assert.equal(readFileSync(resolve(site,'assets/matcher.mjs'),'utf8'),
+  readFileSync(resolve(project,'src/matcher.mjs'),'utf8'),'Matcher published source must match tested source.');
+const planData=readFileSync(resolve(site,'assets/plan-data.mjs'),'utf8');
+for(const name of ['六六云','星辰VPN','西游云','山水云','魔戒','网际快车','FlyBit','超实惠加速','乌龟云','红杏云']){
+  assert.ok(planData.includes(name),'Missing brand historical data: '+name);
+}
 
 const home = readFileSync(resolve(site,'index.html'),'utf8');
 assert.ok(home.includes('name="google-site-verification"'), 'Google verification must remain.');
 assert.ok(home.includes('name="msvalidate.01"'), 'Bing verification must remain.');
 assert.ok(home.includes('id="brands"'), 'Brand directory is missing from homepage.');
+assert.ok(home.includes('id="budget-match"'), 'Cost-to-brand matching panel missing.');
+assert.ok(home.includes('id="match-list"'), 'Matching output container missing.');
 assert.ok(home.includes('<link rel="canonical" href="' + base + '">'), 'Homepage canonical mismatch.');
 assert.ok(!home.includes('本工具没有推广邀请链接'), 'Obsolete no-affiliate statement found.');
 const xml = readFileSync(resolve(site, 'sitemap.xml'),'utf8');
@@ -53,10 +61,12 @@ for (const page of expected.filter(name=>name.endsWith('.html'))) {
 }
 assert.deepEqual(outbound, allowed, 'Missing or unexpected commission target.');
 
-for(const file of ['assets/app.js','assets/engine.mjs','assets/site.css','assets/brand.css']){
+for(const file of ['assets/app.js','assets/engine.mjs','assets/matcher.mjs','assets/plan-data.mjs','assets/site.css','assets/brand.css']){
   const content=readFileSync(resolve(site,file),'utf8');
   assert.ok(!/\b(?:fetch|XMLHttpRequest|sendBeacon|WebSocket)\b/.test(content),file+' tries to access a network API');
 }
-for(const file of ['assets/app.js','assets/engine.mjs'])
+for(const file of ['assets/app.js','assets/engine.mjs','assets/matcher.mjs','assets/plan-data.mjs'])
   execFileSync(process.execPath,['--check',resolve(site,file)],{stdio:'pipe'});
-console.log('Pages verified: 11 indexable HTML pages, 10 exact affiliate URLs, verification meta and sitemap.');
+assert.ok(readFileSync(resolve(site,'assets/app.js'),'utf8').includes("'./matcher.mjs'"));
+assert.ok(readFileSync(resolve(site,'assets/app.js'),'utf8').includes("link.href='./brands/'"));
+console.log('Pages verified: calculator-to-brand internal links, 11 indexable HTML pages, 10 commission URLs, webmaster tags and sitemap.');
