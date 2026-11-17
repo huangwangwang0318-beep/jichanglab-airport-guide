@@ -114,6 +114,10 @@ class PlanDataTests(unittest.TestCase):
                 self.assertTrue(all(url in approved for url in urls), (file, urls))
             elif published in file.parents:
                 self.assertTrue(all(url in approved or url.startswith(pages_demo) for url in urls), (file, urls))
+            elif file == ROOT / "README.md":
+                # The repository landing README itself may link to ten existing
+                # commission targets and to its own verified GitHub Pages guides.
+                self.assertTrue(all(url in approved or url.startswith(pages_demo) for url in urls), (file, urls))
             else:
                 self.assertTrue(all(url == pages_demo or urlsplit(url).hostname in allowed_hosts for url in urls), (file, urls))
 
