@@ -50,7 +50,8 @@ export function matchHistoricalBrands(plans, {months, usageGB, targetTotalYuan, 
     eligible.push({
       provider:p.provider,slug:BRAND_SLUGS[p.provider],planName:p.plan_name,
       approximateYuan:amount,months,withinReference:amount<=targetTotalYuan+0.005,
-      budgetDifferenceYuan:round2(targetTotalYuan-amount),
+      budgetDifferenceYuan:round2((Math.round(targetTotalYuan*100)-Math.round(amount*100))/100),
+      budgetDifferenceCents:Math.round(targetTotalYuan*100)-Math.round(amount*100),
       budgetDistancePercent:round2(Math.abs(targetTotalYuan-amount)/targetTotalYuan*100),
       caveat,sourceDate:p.observed_date
     });
