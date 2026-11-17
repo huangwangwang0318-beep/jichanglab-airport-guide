@@ -1,7 +1,11 @@
 import { comparePlans } from './engine.mjs';
-import { matchHistoricalBrands } from './matcher.mjs';
+import { matchHistoricalBrands, selectMatchingBudget } from './matcher.mjs';
 import { historicalPlans } from './plan-data.mjs';
 const form=document.getElementById('calc-form');
+const matchSource=document.getElementById('match-source');
+const manualBudget=document.getElementById('manual-budget');
+const manualBudgetLabel=document.getElementById('manual-budget-label');
+let lastEditedPlan=null;
 const error=document.getElementById('form-error');
 const defaults={months:'12',usageGB:'50',devices:'1',a_price:'12',a_type:'monthly',a_quotaGB:'100',a_quotaMode:'monthly',a_validityMonths:'2',a_trafficFactor:'1',a_deviceLimit:'3',b_price:'120',b_type:'annual',b_quotaGB:'100',b_quotaMode:'monthly',b_validityMonths:'2',b_trafficFactor:'1',b_deviceLimit:'3'};
 const currency=(x)=>'¥'+Number(x).toFixed(2);
@@ -34,38 +38,41 @@ function renderMatches(res,scenario){
   const list=document.getElementById('match-list');
   const summary=document.getElementById('match-summary');
   list.replaceChildren();
-  const available=[res.A,res.B].filter(r=>r.viable && Number.isFinite(r.totalYuan));
-  if(!available.length){
-    summary.textContent='两个输入方案都未满足已知条件，暂时不能推算可比参考金额。请调整流量或设备需求。';
+  const selected=selectMatchingBudget(res,{
+    mode:matchSource.value,lastEditedPlan,manualAmount:manualBudget.value
+  });
+  if(selected.value===null){
+    summary.textContent=selected.reason||'请调整预算后重新匹配';
     return;
   }
-  const reference=Math.min(...available.map(r=>r.totalYuan));
+  const reference=selected.value;
   const matches=matchHistoricalBrands(historicalPlans,{
     months:Number(scenario.months),usageGB:Number(scenario.usageGB),
-    targetTotalYuan:reference,maxResults:4
+    targetTotalYuan:reference,maxResults:5
   });
-  summary.textContent='以当前较低可用方案的预计总支出 '+currency(reference)+
-    ' 为金额参考，按历史报价寻找接近的品牌。以下仅用于站内导航，不代表实时可购买价格或真实设备适配。';
+  summary.textContent='这次按 '+selected.label+' '+currency(reference)+
+    ' 重新筛选；匹配顺序与预算差额会随计算金额、使用月份或流量变化。';
   if(!matches.length){
     const p=document.createElement('p');
-    p.textContent='暂无可进行可靠金额估算的品牌条目。请浏览下方全部品牌资料，并核对实时结算信息。';
+    p.textContent='没有能根据现有历史资料估算的品牌；可从下方全部10家品牌中核对实时套餐。';
     list.append(p);return;
   }
   for(const m of matches){
-    const card=document.createElement('article'); card.className='match-card';
-    const header=document.createElement('div'); header.className='match-card-head';
+    const card=document.createElement('article');card.className='match-card';
+    const header=document.createElement('div');header.className='match-card-head';
     const title=document.createElement('strong');title.textContent=m.provider;
     const tag=document.createElement('span');tag.className='match-badge';
-    tag.textContent=m.withinReference?'历史金额不高于参考额':'历史金额高于参考额';
+    tag.textContent=m.withinReference?'历史估算不超预算':'历史估算超出预算';
     header.append(title,tag);
     const amount=document.createElement('div');amount.className='match-amount';
     amount.textContent=currency(m.approximateYuan)+' / '+m.months+'个月历史估算';
+    const delta=document.createElement('div');delta.className='match-diff';
+    delta.textContent=(m.withinReference?'比当前预算少 ':'比当前预算多 ')+currency(Math.abs(m.budgetDifferenceYuan));
     const desc=document.createElement('p');desc.className='match-description';
     desc.textContent=m.planName+' · '+m.caveat+'。资料日期：'+m.sourceDate;
     const link=document.createElement('a');link.className='match-link';
-    link.href='./brands/'+m.slug+'/';
-    link.textContent='查看'+m.provider+'详情 →';
-    card.append(header,amount,desc,link);
+    link.href='./brands/'+m.slug+'/';link.textContent='查看'+m.provider+'详情 →';
+    card.append(header,amount,delta,desc,link);
     list.append(card);
   }
 }
@@ -89,7 +96,26 @@ function calc(){
 const oneTimeExample={...defaults,months:'3',a_price:'8',a_type:'one_time',a_quotaGB:'60',a_validityMonths:'2',b_price:'12',b_type:'monthly'};
 function fill(map){for(const [key,value] of Object.entries(map)){const el=form.elements.namedItem(key);if(el)el.value=value;}adjust();calc();}
 form.addEventListener('submit',e=>{e.preventDefault();calc();document.getElementById('result-heading').scrollIntoView({block:'nearest',behavior:'smooth'});});
-form.addEventListener('input',calc);form.addEventListener('change',()=>{adjust();calc()});
-document.getElementById('reset-btn').addEventListener('click',()=>fill(defaults));
-document.getElementById('example-btn').addEventListener('click',()=>fill(oneTimeExample));
+form.addEventListener('input',e=>{
+ const name=e.target?.name||'';
+ if(name.startsWith('a_'))lastEditedPlan='a';
+ else if(name.startsWith('b_'))lastEditedPlan='b';
+ calc();
+});
+form.addEventListener('change',e=>{
+ const name=e.target?.name||'';
+ if(name.startsWith('a_'))lastEditedPlan='a';
+ else if(name.startsWith('b_'))lastEditedPlan='b';
+ adjust();calc();
+});
+matchSource.addEventListener('change',()=>{
+ manualBudgetLabel.hidden=matchSource.value!=='manual';
+ calc();
+});
+manualBudget.addEventListener('input',()=>{if(matchSource.value==='manual')calc()});
+document.getElementById('reset-btn').addEventListener('click',()=>{
+ lastEditedPlan=null;matchSource.value='auto';manualBudget.value='120';manualBudgetLabel.hidden=true;
+ fill(defaults);
+});
+document.getElementById('example-btn').addEventListener('click',()=>{lastEditedPlan=null;fill(oneTimeExample)});
 adjust();calc();
