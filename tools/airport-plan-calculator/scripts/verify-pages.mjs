@@ -35,6 +35,13 @@ const home = readFileSync(resolve(site,'index.html'),'utf8');
 assert.ok(home.includes('name="google-site-verification"'), 'Google verification must remain.');
 assert.ok(home.includes('name="msvalidate.01"'), 'Bing verification must remain.');
 assert.ok(home.includes('id="brands"'), 'Brand directory is missing from homepage.');
+assert.ok(home.includes('id="quick-brands"'), 'Homepage quick brand navigation is missing.');
+assert.equal(home.split('class="quick-choice"').length-1, 4, 'Expected four distinct first-screen brand guide links.');
+assert.ok(home.indexOf('id="quick-brands"') < home.indexOf('id="tool"'), 'Quick brand links should be before the long calculator form.');
+for (const slug of ['xingchen','xiyouyun','shanshuiyun','wangjikuache']) {
+  assert.ok(home.includes('href="./brands/' + slug + '/"'), 'Missing quick brand link to ' + slug);
+}
+
 assert.ok(home.includes('id="budget-match"'), 'Cost-to-brand matching panel missing.');
 assert.ok(home.includes('id="match-list"'), 'Matching output container missing.');
 assert.ok(home.includes('<link rel="canonical" href="' + base + '">'), 'Homepage canonical mismatch.');
@@ -82,6 +89,38 @@ for (const page of expected.filter(name=>name.endsWith('.html'))) {
   assert.equal(remoteResources.length,0,'External scripts, images and stylesheets are forbidden: '+page);
 }
 assert.deepEqual(outbound, allowed, 'Missing or unexpected commission target.');
+
+/* All visible internal links must resolve to actual published HTML and valid in-page anchors. */
+const htmlPages = expected.filter(file => file.endsWith('.html'));
+const knownPages = new Set(htmlPages);
+const sitePrefix = new URL(base).pathname;
+for (const file of htmlPages) {
+  const documentUrl = base + (file === 'index.html' ? '' : file.replace(/index\\.html$/, ''));
+  const html = readFileSync(resolve(site,file),'utf8');
+  const allLinks = [...html.matchAll(/<a\\b[^>]*\\bhref="([^"]+)"/g)].map(m => m[1]);
+  for (const href of allLinks) {
+    if (href.startsWith('https://') || href.startsWith('http://')) continue;
+    assert.ok(!href.startsWith('javascript:'), 'Invalid JS pseudo-link: ' + file);
+    const destination = new URL(href, documentUrl);
+    assert.equal(destination.host, new URL(base).host, 'Unexpected link host in ' + file);
+    assert.ok(destination.pathname.startsWith(sitePrefix), 'Internal link outside project root: ' + file + ' ' + href);
+    let target = destination.pathname.slice(sitePrefix.length);
+    if (!target || target.endsWith('/')) target += 'index.html';
+    assert.ok(knownPages.has(target), 'Broken internal HTML path: ' + file + ' -> ' + href);
+    if (destination.hash) {
+      const id = decodeURIComponent(destination.hash.slice(1));
+      const targetHtml = readFileSync(resolve(site,target),'utf8');
+      assert.ok(targetHtml.includes('id="' + id + '"'), 'Broken in-page anchor: ' + file + ' -> ' + href);
+    }
+  }
+}
+for (const slug of names) {
+  const html = readFileSync(resolve(site,'brands',slug,'index.html'),'utf8');
+  const related = [...html.matchAll(/href="\\.\\.\\/([a-z0-9-]+)\\/"/g)].map(m=>m[1]);
+  assert.equal(related.length,2,'Expected two related brand comparisons: '+slug);
+  assert.ok(related.every(other=>names.includes(other)&&other!==slug), 'Bad related internal targets: '+slug);
+}
+
 
 for(const file of ['assets/app.js','assets/engine.mjs','assets/matcher.mjs','assets/plan-data.mjs','assets/site.css','assets/brand.css']){
   const content=readFileSync(resolve(site,file),'utf8');
