@@ -5,11 +5,21 @@ on:
     paths:
       - '.github/workflows/calculator-pages.yml'
       - 'tools/airport-plan-calculator/**'
+      - 'commercial-site/brands/**'
+      - 'commercial-site/assets/site.css'
+      - 'commercial-site/affiliate-links.json'
+      - 'data/plans.json'
+      - 'tests/**'
   push:
     branches: [main]
     paths:
       - '.github/workflows/calculator-pages.yml'
       - 'tools/airport-plan-calculator/**'
+      - 'commercial-site/brands/**'
+      - 'commercial-site/assets/site.css'
+      - 'commercial-site/affiliate-links.json'
+      - 'data/plans.json'
+      - 'tests/**'
   workflow_dispatch:
 
 permissions:

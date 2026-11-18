@@ -26,3 +26,22 @@
 .match-controls select,.match-controls input{width:100%;padding:10px;border:1px solid #bccce1;border-radius:9px;background:#fff;color:#1b3555;min-width:0}
 .match-diff{font-size:13px;font-weight:700;color:#2462a9;margin:-2px 0 6px}
 @media(max-width:650px){.match-controls{grid-template-columns:1fr}}
+
+
+/* Immediate, search-crawlable brand discovery above the calculator. */
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.hero-actions .button{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.quick-chooser{padding-top:27px;padding-bottom:5px;scroll-margin-top:22px}
+.quick-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:13px}
+.quick-head h2{font-size:23px;margin:4px 0 6px}
+.quick-head p{color:#586b82;margin:0;font-size:14px;line-height:1.7}
+.quick-more{font-weight:750;color:var(--blue);white-space:nowrap;font-size:14px;padding-bottom:7px}
+.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.quick-choice{min-width:0;border:1px solid #dce5f3;border-radius:14px;padding:17px 15px;display:flex;flex-direction:column;gap:8px;background:#fff;box-shadow:0 5px 18px rgba(24,70,126,.04);text-decoration:none}
+.quick-choice:hover{border-color:#94b5e8;background:#f7fbff}
+.quick-choice strong{font-size:16px;color:#153866}
+.quick-choice span{color:#596c82;font-size:13px;line-height:1.6;flex:1}
+.quick-choice b{font-size:13px;color:var(--blue)}
+.quick-disclosure{margin:10px 0 0;color:#697991;font-size:12px;line-height:1.65}
+@media(max-width:970px){.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.quick-grid{grid-template-columns:1fr}.quick-head{align-items:flex-start;flex-direction:column}.quick-more{padding-bottom:0}.hero-actions .button{white-space:normal}}
