@@ -40,6 +40,13 @@ for (const [slug, name] of brandList) {
   if (!html.includes(approved[name])) throw new Error('Missing invitation URL for ' + name);
   if (!html.includes('href="../../assets/site.css"')) throw new Error('Unexpected brand stylesheet: ' + name);
   html = html.replace('href="../../assets/site.css"', 'href="../../assets/brand.css"');
+  // The Pages calculator uses #tool and #method; the standalone commercial
+  // source site uses #calc and #guide. Rewrite only in the Pages build.
+  if (!html.includes('../../index.html#calc') || !html.includes('../../index.html#guide')) {
+    throw new Error('Expected source navigation anchors missing for ' + name);
+  }
+  html = html.replaceAll('../../index.html#calc', '../../index.html#tool');
+  html = html.replaceAll('../../index.html#guide', '../../index.html#method');
   html = html.replace('</head>', '<link rel="canonical" href="' + canonical + '"></head>');
   mkdirSync(dirname(target), {recursive: true});
   writeFileSync(target, html, 'utf8');
