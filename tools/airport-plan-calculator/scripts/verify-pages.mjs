@@ -70,7 +70,7 @@ for (const page of expected.filter(name=>name.endsWith('.html'))) {
     assert.ok(html.includes('href="../../index.html#method"'), 'Missing real methods anchor: ' + page);
     assert.ok(!html.includes('href="../../index.html#calc"'), 'Stale calculator anchor: ' + page);
     assert.ok(!html.includes('href="../../index.html#guide"'), 'Stale guide anchor: ' + page);
-    assert.ok((html.match(/<h2\\b/g)||[]).length >= 4, 'Missing unique comparison section: ' + page);
+    assert.ok((html.match(/<h2\b/g)||[]).length >= 4, 'Missing unique comparison section: ' + page);
   }
   const links=[...html.matchAll(/<a\b[^>]*href="(https?:\/\/[^"]+)"[^>]*>/g)];
   for(const match of links) {
