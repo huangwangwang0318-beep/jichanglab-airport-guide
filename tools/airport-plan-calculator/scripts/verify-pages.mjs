@@ -39,7 +39,7 @@ assert.ok(home.includes('id="budget-match"'), 'Cost-to-brand matching panel miss
 assert.ok(home.includes('id="match-list"'), 'Matching output container missing.');
 assert.ok(home.includes('<link rel="canonical" href="' + base + '">'), 'Homepage canonical mismatch.');
 assert.ok(!home.includes('本工具没有推广邀请链接'), 'Obsolete no-affiliate statement found.');
-const structured = [...home.matchAll(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/g)];
+const structured = [...home.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
 assert.equal(structured.length, 1, 'Only truthful WebApplication structured data is expected.');
 const webApp = JSON.parse(structured[0][1]);
 assert.equal(webApp['@context'], 'https://schema.org');
@@ -49,7 +49,7 @@ assert.equal(webApp.isAccessibleForFree, true);
 assert.equal(webApp.offers.price, '0');
 assert.ok(!('aggregateRating' in webApp) && !('review' in webApp), 'No fabricated ratings.');
 assert.ok(!home.includes('"FAQPage"'), 'Do not promise deprecated FAQ rich results.');
-const intros = [...home.matchAll(/<article class="provider-card">[\\s\\S]*?<h3>[\\s\\S]*?<\\/h3><p>([^<]+)<\\/p>/g)].map(m=>m[1]);
+const intros = [...home.matchAll(/<article class="provider-card">[\s\S]*?<h3>[\s\S]*?<\/h3><p>([^<]+)<\/p>/g)].map(m=>m[1]);
 assert.equal(intros.length, 10, 'Ten brand cards must have visible descriptions.');
 assert.equal(new Set(intros).size, 10, 'All ten brand descriptions must differ.');
 assert.ok(!home.includes('查看独立品牌资料、历史参考套餐与购买前核查要点。'), 'Repeated placeholder card copy is forbidden.');
