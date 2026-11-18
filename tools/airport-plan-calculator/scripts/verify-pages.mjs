@@ -95,9 +95,9 @@ const htmlPages = expected.filter(file => file.endsWith('.html'));
 const knownPages = new Set(htmlPages);
 const sitePrefix = new URL(base).pathname;
 for (const file of htmlPages) {
-  const documentUrl = base + (file === 'index.html' ? '' : file.replace(/index\\.html$/, ''));
+  const documentUrl = base + (file === 'index.html' ? '' : file.replace(/index\.html$/, ''));
   const html = readFileSync(resolve(site,file),'utf8');
-  const allLinks = [...html.matchAll(/<a\\b[^>]*\\bhref="([^"]+)"/g)].map(m => m[1]);
+  const allLinks = [...html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(m => m[1]);
   for (const href of allLinks) {
     if (href.startsWith('https://') || href.startsWith('http://')) continue;
     assert.ok(!href.startsWith('javascript:'), 'Invalid JS pseudo-link: ' + file);
@@ -116,7 +116,7 @@ for (const file of htmlPages) {
 }
 for (const slug of names) {
   const html = readFileSync(resolve(site,'brands',slug,'index.html'),'utf8');
-  const related = [...html.matchAll(/href="\\.\\.\\/([a-z0-9-]+)\\/"/g)].map(m=>m[1]);
+  const related = [...html.matchAll(/href="\.\.\/([a-z0-9-]+)\/"/g)].map(m=>m[1]);
   assert.equal(related.length,2,'Expected two related brand comparisons: '+slug);
   assert.ok(related.every(other=>names.includes(other)&&other!==slug), 'Bad related internal targets: '+slug);
 }
