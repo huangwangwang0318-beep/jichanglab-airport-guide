@@ -39,6 +39,21 @@ assert.ok(home.includes('id="budget-match"'), 'Cost-to-brand matching panel miss
 assert.ok(home.includes('id="match-list"'), 'Matching output container missing.');
 assert.ok(home.includes('<link rel="canonical" href="' + base + '">'), 'Homepage canonical mismatch.');
 assert.ok(!home.includes('本工具没有推广邀请链接'), 'Obsolete no-affiliate statement found.');
+const structured = [...home.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+assert.equal(structured.length, 1, 'Only truthful WebApplication structured data is expected.');
+const webApp = JSON.parse(structured[0][1]);
+assert.equal(webApp['@context'], 'https://schema.org');
+assert.equal(webApp['@type'], 'WebApplication');
+assert.equal(webApp.url, base);
+assert.equal(webApp.isAccessibleForFree, true);
+assert.equal(webApp.offers.price, '0');
+assert.ok(!('aggregateRating' in webApp) && !('review' in webApp), 'No fabricated ratings.');
+assert.ok(!home.includes('"FAQPage"'), 'Do not promise deprecated FAQ rich results.');
+const intros = [...home.matchAll(/<article class="provider-card">[\s\S]*?<h3>[\s\S]*?<\/h3><p>([^<]+)<\/p>/g)].map(m=>m[1]);
+assert.equal(intros.length, 10, 'Ten brand cards must have visible descriptions.');
+assert.equal(new Set(intros).size, 10, 'All ten brand descriptions must differ.');
+assert.ok(!home.includes('查看独立品牌资料、历史参考套餐与购买前核查要点。'), 'Repeated placeholder card copy is forbidden.');
+
 const xml = readFileSync(resolve(site, 'sitemap.xml'),'utf8');
 const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m=>m[1]);
 assert.deepEqual(locations, [base, ...names.map(n => base + 'brands/' + n + '/')]);
@@ -50,6 +65,13 @@ for (const page of expected.filter(name=>name.endsWith('.html'))) {
   assert.ok(!html.includes('noindex'),'Unindexable: '+page);
   const canonical=base+(page==='index.html'?'':page.replace(/index\.html$/,''));
   assert.ok(html.includes('<link rel="canonical" href="'+canonical+'">'),'Bad canonical: '+page);
+  if (page !== 'index.html') {
+    assert.ok(html.includes('href="../../index.html#tool"'), 'Missing real calculator anchor: ' + page);
+    assert.ok(html.includes('href="../../index.html#method"'), 'Missing real methods anchor: ' + page);
+    assert.ok(!html.includes('href="../../index.html#calc"'), 'Stale calculator anchor: ' + page);
+    assert.ok(!html.includes('href="../../index.html#guide"'), 'Stale guide anchor: ' + page);
+    assert.ok((html.match(/<h2\b/g)||[]).length >= 4, 'Missing unique comparison section: ' + page);
+  }
   const links=[...html.matchAll(/<a\b[^>]*href="(https?:\/\/[^"]+)"[^>]*>/g)];
   for(const match of links) {
     assert.ok(allowed.has(match[1]),'Unapproved clickable external URL in '+page+': '+match[1]);

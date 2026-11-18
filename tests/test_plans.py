@@ -113,7 +113,15 @@ class PlanDataTests(unittest.TestCase):
             if commercial in file.parents:
                 self.assertTrue(all(url in approved for url in urls), (file, urls))
             elif published in file.parents:
-                self.assertTrue(all(url in approved or url.startswith(pages_demo) for url in urls), (file, urls))
+                # The only non-clickable external identifier is the JSON-LD
+                # schema.org context on the calculator homepage. HTML anchors
+                # are separately checked in the Pages payload verifier.
+                def approved_page_url(url):
+                    return (url in approved or url.startswith(pages_demo)
+                            or (file == published / "index.html"
+                                and url == "https://schema.org"
+                                and '<script type="application/ld+json">' in content))
+                self.assertTrue(all(approved_page_url(url) for url in urls), (file, urls))
             elif file == ROOT / "README.md":
                 # The repository landing README itself may link to ten existing
                 # commission targets and to its own verified GitHub Pages guides.
